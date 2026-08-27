@@ -41,7 +41,7 @@ class AsyncLLMCorrector:
             try:
                 from google.genai import types
                 response = await self.client.aio.models.generate_content(
-                    model='gemini-2.5-flash-lite',
+                    model='gemini-3.5-flash-lite',
                     contents=text,
                     config=types.GenerateContentConfig(
                         system_instruction=sys_prompt,
@@ -54,7 +54,7 @@ class AsyncLLMCorrector:
             except Exception as e:
                 err_str = str(e)
                 logger.warning(f"LLM correction failed on key idx {self.current_idx}: {err_str}")
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "Quota" in err_str or "400" in err_str:
+                if any(x in err_str for x in ["429", "RESOURCE_EXHAUSTED", "Quota", "400", "403", "PERMISSION_DENIED", "404", "NOT_FOUND"]):
                     attempts += 1
                     if attempts < len(self.api_keys):
                         self.current_idx = (self.current_idx + 1) % len(self.api_keys)
