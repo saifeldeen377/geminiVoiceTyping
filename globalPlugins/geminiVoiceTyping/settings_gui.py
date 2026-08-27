@@ -40,11 +40,19 @@ if _has_gui:
                 wx.CheckBox(self, label="Auto copy result to clipboard")
             )
             self.copyClipboardCheckbox.SetValue(config.get("copy_to_clipboard", False))
+            
+            # System Prompt text control
+            promptLabel = wx.StaticText(self, label="System Prompt (تعليمات الذكاء الاصطناعي):")
+            settingsSizer.Add(promptLabel, 0, wx.ALL, 5)
+            self.promptCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(-1, 150))
+            self.promptCtrl.SetValue(config.get("system_prompt", ""))
+            settingsSizer.Add(self.promptCtrl, 0, wx.ALL | wx.EXPAND, 5)
 
         def onSave(self):
             config.set("api_keys", self.apiKeysCtrl.GetValue().strip())
             config.set("beep_on_key_rotation", self.beepOnRotateCheckbox.GetValue())
             config.set("copy_to_clipboard", self.copyClipboardCheckbox.GetValue())
+            config.set("system_prompt", self.promptCtrl.GetValue())
 
 else:
     class GeminiVoiceTypingSettingsPanel:

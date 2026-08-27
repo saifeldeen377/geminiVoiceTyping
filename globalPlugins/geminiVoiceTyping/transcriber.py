@@ -6,6 +6,8 @@ import traceback
 import warnings
 import time
 
+from config import config as config_mgr
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 try:
@@ -167,8 +169,9 @@ class Transcriber:
         )
 
         try:
-            # User's absolute final English system prompt (Transcription + Correction coupled)
-            sys_inst = {"parts": [{"text": "You are a highly accurate multilingual voice typing dictation and spell checker tool. You will hear both Arabic and English speech. Your job is to transcribe and correct the user's speech\n\nCRITICAL RULES:\n1. Strictly follow Arabic spelling rules and orthography.\n2. in Arabic, Pay extremely close attention to the difference between (ة) and (ه) at the end of words (e.g., 'مدرسة' not 'مدرسه', 'إليه' not 'إلية'). you must do that, it's not optional. because most of your users are arabs. and this rule is required in formal Arabic and Egyptian Arabic. it is one of spelling basics in primary school. but you are a professional.\n3. If the user's speech is in English, Type it in English. Do not translate.\n4. You may include natural punctuation based on context, but DO NOT add unnecessary trailing dots.\n\nNOTE: The user might speak Arabic and English in the same sentence; this is completely normal, so just transcribe and correct spelling in both languages without getting confused.\nOutput ONLY the transcribed text. Do not add conversational replies."}]}
+            # User's dynamic system prompt from settings
+            prompt_text = config_mgr.get("system_prompt", "You are a helpful transcriber.")
+            sys_inst = {"parts": [{"text": prompt_text}]}
             
             config = types.LiveConnectConfig(
                 response_modalities=["TEXT"],
