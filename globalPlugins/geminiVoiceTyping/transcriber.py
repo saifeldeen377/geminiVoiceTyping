@@ -73,18 +73,21 @@ class Transcriber:
             await asyncio.sleep(0.2)
             if self._current_text:
                 if time.time() - self._last_update_time > 1.0:
-                    self._flush_text()
+                    await self._flush_text()
 
-    def _flush_text(self):
+    async def _flush_text(self):
         if not self._current_text:
             return
             
+        diff = ""
         if self._current_text.startswith(self._flushed_text):
             diff = self._current_text[len(self._flushed_text):].strip()
-            if diff:
-                self._emit(f"TEXT:{diff} ")
         else:
-            self._emit(f"TEXT:{self._current_text} ")
+            diff = self._current_text.strip()
+            
+        if diff:
+            corrected_diff = await corrector.correct_sentence(diff)
+            self._emit(f"TEXT:{corrected_diff} ")
             
         self._flushed_text = self._current_text
         self._last_update_time = time.time() 
@@ -110,8 +113,6 @@ class Transcriber:
                             if t:
                                 clean = t.strip(" .")
                                 if clean:
-                                    # Post-processing layer
-                                    clean = corrector.correct_sentence(clean)
                                     if clean != self._current_text:
                                         self._current_text = clean
                                         self._last_update_time = time.time()
@@ -121,10 +122,11 @@ class Transcriber:
                             for part in getattr(model_turn, "parts", []):
                                 if hasattr(part, "text") and part.text:
                                     clean_part = part.text.strip(" .")
+                                    # We do not emit here anymore, we let the VAD flush handle it!
+                                    # But wait, if model_turn arrives, we should flush!
                                     if clean_part:
-                                        # Post-processing layer
-                                        clean_part = corrector.correct_sentence(clean_part)
-                                        self._emit(f"TEXT:{clean_part} ")
+                                        self._current_text = clean_part
+                                        await self._flush_text()
                                     
                     except Exception:
                         pass
@@ -145,7 +147,7 @@ class Transcriber:
                 break
             if not line or line.strip().upper() == "STOP":
                 self.running = False
-                self._flush_text()
+                await self._flush_text()
                 break
 
     def _emit(self, msg: str):
@@ -164,6 +166,8 @@ class Transcriber:
             http_options={"api_version": "v1beta"},
             api_key=api_key,
         )
+        
+        corrector.setup(client)
 
         self.out_queue = asyncio.Queue(maxsize=40)
         self._stream = sd.InputStream(
