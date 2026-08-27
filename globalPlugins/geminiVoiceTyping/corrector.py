@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import logging
 import asyncio
@@ -53,7 +53,7 @@ class AsyncLLMCorrector:
                 return text
             except Exception as e:
                 err_str = str(e)
-                print(f"ERROR:LLM correction failed on key idx {self.current_idx}: {err_str}", flush=True)
+                logger.warning(f"LLM correction failed on key idx {self.current_idx}: {err_str}")
                 if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "Quota" in err_str or "400" in err_str:
                     attempts += 1
                     if attempts < len(self.api_keys):
