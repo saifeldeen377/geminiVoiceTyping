@@ -209,6 +209,34 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 if line.startswith("TEXT:"):
                     text = line[5:]
                     if text and _in_nvda:
+                        # Algorithmic fallback for Egyptian Dialect Taa Marbouta
+                        # Instead of a limited dictionary, we use morphological rules.
+                        exceptions = {
+                            "الله", "بالله", "والله", "تالله", "لله", "إله", "الإله",
+                            "وجه", "الوجه", "مياه", "المياه", "فواكه", "الفواكه", 
+                            "شفاه", "الشفاه", "جباه", "الجباه", "شبه", "الشبه", "جنيه", "الجنيه",
+                            "تنبيه", "التنبيه", "توجيه", "التوجيه", "مشتبه", "المشتبه", "سفاهه", "السفاهه",
+                            "منه", "عنه", "له", "به", "فيه", "عليه", "إليه", "دونه", "حوله", "تجاهه",
+                            "يكره", "يواجه", "يشابه", "يفقه", "يتجه", "ينبه", "ينته"
+                        }
+                        
+                        words = text.split(" ")
+                        for i, word in enumerate(words):
+                            clean_word = "".join(c for c in word if c.isalpha())
+                            if not clean_word.endswith("ه") or clean_word in exceptions:
+                                continue
+                            
+                            # Rule 1: Words starting with "ال" (and its prefixes) ending in "ه" are almost always "ة"
+                            if clean_word.startswith("ال") or clean_word.startswith("وال") or clean_word.startswith("فال") or clean_word.startswith("كال") or clean_word.startswith("بال"):
+                                # Replace the last 'ه' with 'ة' (handling punctuation)
+                                words[i] = word[::-1].replace("ه", "ة", 1)[::-1]
+                            # Rule 2: Words ending in "يه" are almost always "ية" (e.g., عربيه, كراسه)
+                            elif clean_word.endswith("يه") or clean_word.endswith("عه") or clean_word.endswith("قه") or clean_word.endswith("فه") or clean_word.endswith("سه") or clean_word.endswith("شه"):
+                                # If it's a known pronoun word it would be caught by exceptions. Otherwise it's likely a feminine adjective.
+                                words[i] = word[::-1].replace("ه", "ة", 1)[::-1]
+
+                        text = " ".join(words)
+
                         is_stealth = not config.get("copy_to_clipboard", False)
                         core.callLater(0, paste_text, text, stealth=is_stealth)
                     continue
