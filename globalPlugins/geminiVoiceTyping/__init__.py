@@ -206,10 +206,28 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         core.callLater(50, ui.message, err_msg)
                     break
 
-                # TEXT:transcribed words -> paste into focused field
                 if line.startswith("TEXT:"):
                     text = line[5:]
                     if text and _in_nvda:
+                        # Auto-correct stubborn phonetic transcriptions of Egyptian dialect
+                        corrections = {
+                            "بالاضافه": "بالإضافة",
+                            "بالإضافه": "بالإضافة",
+                            "شغاله": "شغالة",
+                            "المربوطه": "المربوطة",
+                            "مربوطه": "مربوطة",
+                            "اضافه": "إضافة",
+                            "إضافه": "إضافة",
+                            "الاضافه": "الإضافة",
+                            "الإضافه": "الإضافة"
+                        }
+                        # Safe word replacement without regex boundaries (which can fail in Arabic)
+                        for wrong, right in corrections.items():
+                            text = text.replace(f" {wrong} ", f" {right} ")
+                            if text.startswith(wrong + " "): text = text.replace(wrong + " ", right + " ", 1)
+                            if text.endswith(" " + wrong): text = text[::-1].replace((" " + wrong)[::-1], (" " + right)[::-1], 1)[::-1]
+                            if text == wrong: text = right
+
                         is_stealth = not config.get("copy_to_clipboard", False)
                         core.callLater(0, paste_text, text, stealth=is_stealth)
                     continue
