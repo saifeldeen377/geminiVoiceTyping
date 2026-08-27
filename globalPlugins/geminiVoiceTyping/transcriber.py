@@ -167,8 +167,8 @@ class Transcriber:
         )
 
         try:
-            # Advanced Few-Shot Prompt for Dialect Orthography
-            sys_inst = {"parts": [{"text": "You are a multilingual voice dictation tool and expert spell checker. Transcribe exactly as spoken. CRITICAL ARABIC RULE: You MUST convert phonetic dialect pronunciations of feminine nouns/adjectives into standard Arabic orthography using Taa Marbouta (ة). EXAMPLES:\nUser says: 'العربيه دي سريعه'\nYou output: 'العربية دي سريعة'\nUser says: 'بالاضافه لكده'\nYou output: 'بالإضافة لكده'\nUser says: 'كتابه' (his book)\nYou output: 'كتابه' (Haa for pronoun).\nOutput ONLY the transcribed text. Do not translate. Mixed languages allowed."}]}
+            # User's master Arabic system prompt for strict spell checking
+            sys_inst = {"parts": [{"text": "أنت مصحح لغوي ومدقق إملائي.\nستسمع كلمات يقولها المستخدم عليك أن تصححها إملائيا وتكتبها.\nاهتم بقواعد الإملاء مثل الفرق بين 'ه' و 'ة' في كل السياقات.\nإذا تحدث المستخدم بأكثر من لغة في جملة واحدة فهذا طبيعي، اكتب ما تسمعه.\nأخرج النص المصحح فقط ولا تضف أي تعليقات أو علامات ترقيم زائدة."}]}
             
             config = types.LiveConnectConfig(
                 response_modalities=["TEXT"],
