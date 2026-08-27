@@ -42,7 +42,7 @@ if _has_gui:
             self.copyClipboardCheckbox.SetValue(config.get("copy_to_clipboard", False))
             
             # System Prompt text control
-            promptLabel = wx.StaticText(self, label="System Prompt (تعليمات الذكاء الاصطناعي):")
+            promptLabel = wx.StaticText(self, label="System Prompt:")
             settingsSizer.Add(promptLabel, 0, wx.ALL, 5)
             self.promptCtrl = wx.TextCtrl(self, style=wx.TE_MULTILINE, size=(-1, 150))
             self.promptCtrl.SetValue(config.get("system_prompt", ""))
