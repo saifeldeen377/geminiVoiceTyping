@@ -20,7 +20,7 @@ class AsyncLLMCorrector:
         if not text or not self.client:
             return text
             
-        sys_prompt = "You are a strict Arabic text corrector. Your ONLY job is to fix spelling mistakes in the input text. Specifically, you MUST replace every incorrect Haa (ه) at the end of nouns with a Taa Marbouta (ة). For example, change الاضافه to الإضافة, and مدرسه to مدرسة. Return ONLY the corrected Arabic text and nothing else."
+        sys_prompt = "You are a strict text corrector. Your ONLY job is to fix spelling mistakes in the input text. Specifically, you MUST replace every incorrect Haa (ه) at the end of Arabic nouns with a Taa Marbouta (ة). For example, change الاضافه to الإضافة, and مدرسه to مدرسة. Return ONLY the corrected text and nothing else."
         
         try:
             from google.genai import types
