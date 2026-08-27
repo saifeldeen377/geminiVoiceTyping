@@ -117,17 +117,6 @@ class Transcriber:
                                         self._current_text = clean
                                         self._last_update_time = time.time()
                                     
-                        model_turn = getattr(sc, "model_turn", None)
-                        if model_turn:
-                            for part in getattr(model_turn, "parts", []):
-                                if hasattr(part, "text") and part.text:
-                                    clean_part = part.text.strip(" .")
-                                    # We do not emit here anymore, we let the VAD flush handle it!
-                                    # But wait, if model_turn arrives, we should flush!
-                                    if clean_part:
-                                        self._current_text = clean_part
-                                        await self._flush_text()
-                                    
                     except Exception:
                         pass
             except asyncio.CancelledError:
