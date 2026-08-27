@@ -1,0 +1,7 @@
+﻿dist/
+__pycache__/
+*.pyc
+mingit/
+mingit.zip
+gh_cli/
+gh.zip
