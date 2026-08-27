@@ -167,8 +167,8 @@ class Transcriber:
         )
 
         try:
-            # Updated system instruction explicitly prioritizing Taa Marbouta over dialect phonetics
-            sys_inst = {"parts": [{"text": "You are a highly accurate multilingual voice typing dictation tool. CRITICAL RULES FOR ARABIC: 1. You MUST differentiate between Taa Marbouta (ة) and Haa (ه) at the ends of words. Even if the user speaks in an Egyptian or colloquial dialect, YOU MUST spell feminine nouns and adjectives with Taa Marbouta (e.g. 'شغالة' NOT 'شغاله', 'بالإضافة' NOT 'بالاضافه'). Most of your users are Arabs and this rule is non-negotiable. 2. Transcribe exactly what you hear (including colloquial dialects) but ALWAYS apply standard Arabic orthography for ة and ه. 3. If the user speaks English, write it using the English alphabet. Do not translate. Output ONLY the transcribed text without trailing dots. Mixed Arabic/English in the same sentence is completely normal."}]}
+            # Simplified system instruction focusing only on transcription and mixed languages
+            sys_inst = {"parts": [{"text": "You are a highly accurate multilingual voice typing dictation tool. Transcribe the user's speech exactly as spoken. If the user mixes multiple languages (like Arabic and English) in the same sentence, transcribe both naturally without getting confused. Output ONLY the transcribed text. Do not translate. Do not add unnecessary trailing punctuation."}]}
             
             config = types.LiveConnectConfig(
                 response_modalities=["TEXT"],
