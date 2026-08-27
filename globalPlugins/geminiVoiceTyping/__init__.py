@@ -209,6 +209,24 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 if line.startswith("TEXT:"):
                     text = line[5:]
                     if text and _in_nvda:
+                        # Bulletproof fallback for common dialect phonetic mistakes
+                        corrections = {
+                            "بالاضافه": "بالإضافة", "بالإضافه": "بالإضافة", "الاضافه": "الإضافة", "الإضافه": "الإضافة", "اضافه": "إضافة", "إضافه": "إضافة",
+                            "شغاله": "شغالة", "كويسه": "كويسة", "المربوطه": "المربوطة", "مربوطه": "مربوطة",
+                            "مره": "مرة", "المره": "المرة", "عربيه": "عربية", "العربيه": "العربية",
+                            "حلوه": "حلوة", "الحلوه": "الحلوة", "كتيره": "كتيرة", "الكتيره": "الكتيرة",
+                            "كبيره": "كبيرة", "الكبيره": "الكبيرة", "صغيره": "صغيرة", "الصغيره": "الصغيرة",
+                            "جديده": "جديدة", "الجديده": "الجديدة", "قديمه": "قديمة", "القديمه": "القديمة",
+                            "جميله": "جميلة", "الجميله": "الجميلة", "بطيئه": "بطيئة", "البطيئه": "البطيئة",
+                            "سريعه": "سريعة", "السريعه": "السريعة", "مهمه": "مهمة", "المهمه": "المهمة",
+                            "مشكله": "مشكلة", "المشكله": "المشكلة", "فكره": "فكرة", "الفكره": "الفكرة"
+                        }
+                        for wrong, right in corrections.items():
+                            text = text.replace(f" {wrong} ", f" {right} ")
+                            if text.startswith(wrong + " "): text = text.replace(wrong + " ", right + " ", 1)
+                            if text.endswith(" " + wrong): text = text[::-1].replace((" " + wrong)[::-1], (" " + right)[::-1], 1)[::-1]
+                            if text == wrong: text = right
+
                         is_stealth = not config.get("copy_to_clipboard", False)
                         core.callLater(0, paste_text, text, stealth=is_stealth)
                     continue
