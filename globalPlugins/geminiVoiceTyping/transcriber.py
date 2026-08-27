@@ -7,6 +7,7 @@ import warnings
 import time
 
 from config import config as config_mgr
+from corrector import corrector
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -108,9 +109,12 @@ class Transcriber:
                             t = getattr(interim, "text", "")
                             if t:
                                 clean = t.strip(" .")
-                                if clean and clean != self._current_text:
-                                    self._current_text = clean
-                                    self._last_update_time = time.time()
+                                if clean:
+                                    # Post-processing layer
+                                    clean = corrector.correct_sentence(clean)
+                                    if clean != self._current_text:
+                                        self._current_text = clean
+                                        self._last_update_time = time.time()
                                     
                         model_turn = getattr(sc, "model_turn", None)
                         if model_turn:
@@ -118,6 +122,8 @@ class Transcriber:
                                 if hasattr(part, "text") and part.text:
                                     clean_part = part.text.strip(" .")
                                     if clean_part:
+                                        # Post-processing layer
+                                        clean_part = corrector.correct_sentence(clean_part)
                                         self._emit(f"TEXT:{clean_part} ")
                                     
                     except Exception:
