@@ -219,7 +219,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                             "اضافه": "إضافة",
                             "إضافه": "إضافة",
                             "الاضافه": "الإضافة",
-                            "الإضافه": "الإضافة"
+                            "الإضافه": "الإضافة",
+                            "مره": "مرة",
+                            "المره": "المرة",
+                            "عربيه": "عربية",
+                            "العربيه": "العربية",
+                            "حلوه": "حلوة",
+                            "الحلوه": "الحلوة",
+                            "كتيره": "كتيرة",
+                            "الكتيره": "الكتيرة"
                         }
                         # Safe word replacement without regex boundaries (which can fail in Arabic)
                         for wrong, right in corrections.items():
