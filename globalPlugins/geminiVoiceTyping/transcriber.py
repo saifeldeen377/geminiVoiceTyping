@@ -180,6 +180,21 @@ class Transcriber:
             
             async with client.aio.live.connect(model=MODEL, config=config) as session:
                 self.session = session
+                
+                # --- REAL HISTORY SIMULATION ---
+                # We send a deliberate mistake, drop the reply, then send a correction, drop the reply.
+                try:
+                    await session.send(input="كلمه لعبه الاضافه", end_of_turn=True)
+                    async for _ in session.receive():
+                        pass
+                    
+                    await session.send(input="أنت أخطأت! يجب أن تصحح الكلمات وتكتبها بالتاء المربوطة هكذا: كلمة لعبة الإضافة. تذكر دائماً (ة) وليس (ه)", end_of_turn=True)
+                    async for _ in session.receive():
+                        pass
+                except Exception:
+                    pass # Ignore if simulation fails, just continue
+                # -------------------------------
+                
                 self._emit("READY")
                 self._stream.start()
 
