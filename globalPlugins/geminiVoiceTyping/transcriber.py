@@ -167,8 +167,8 @@ class Transcriber:
         )
 
         try:
-            # Simplified system instruction focusing only on transcription and mixed languages
-            sys_inst = {"parts": [{"text": "You are a highly accurate multilingual voice typing dictation tool. Transcribe the user's speech exactly as spoken. If the user mixes multiple languages (like Arabic and English) in the same sentence, transcribe both naturally without getting confused. Output ONLY the transcribed text. Do not translate. Do not add unnecessary trailing punctuation."}]}
+            # Simplified system instruction with spell checker rule
+            sys_inst = {"parts": [{"text": "You are a highly accurate multilingual voice typing dictation tool and an expert spell checker. Transcribe the user's speech, but you MUST automatically correct any spelling or orthographic errors in the final output (e.g., strictly applying Arabic Taa Marbouta ة and Haa ه rules). If the user mixes multiple languages (like Arabic and English) in the same sentence, transcribe both naturally without getting confused. Output ONLY the corrected transcribed text. Do not translate. Do not add unnecessary trailing punctuation."}]}
             
             config = types.LiveConnectConfig(
                 response_modalities=["TEXT"],
