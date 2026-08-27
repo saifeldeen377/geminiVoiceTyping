@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import os
 import logging
 import asyncio
@@ -11,10 +11,24 @@ logger = logging.getLogger("geminiVoiceTyping.corrector")
 
 class AsyncLLMCorrector:
     def __init__(self):
+        self.api_keys = []
+        self.current_idx = 0
         self.client = None
 
-    def setup(self, client):
-        self.client = client
+    def setup(self, api_keys):
+        if not api_keys:
+            return
+        self.api_keys = api_keys
+        self.current_idx = 0
+        self._init_client()
+
+    def _init_client(self):
+        if self.api_keys:
+            from google import genai
+            self.client = genai.Client(
+                http_options={"api_version": "v1beta"},
+                api_key=self.api_keys[self.current_idx]
+            )
 
     async def correct_sentence(self, text):
         if not text or not self.client:
@@ -22,21 +36,31 @@ class AsyncLLMCorrector:
             
         sys_prompt = "Read this text and if there is a spelling error, correct it; and if there is a grammar error, correct it too. Ensure incorrect Haa (ه) at the end of nouns is replaced with Taa Marbouta (ة). CRITICAL: Preserve colloquial dialects (like Egyptian Arabic) exactly as spoken, DO NOT translate to Modern Standard Arabic (Fusha). Do NOT translate or remove English words. Only output the corrected text, no additional conversational response needed, just the corrected text."
         
-        try:
-            from google.genai import types
-            response = await self.client.aio.models.generate_content(
-                model='gemini-2.5-flash-lite',
-                contents=text,
-                config=types.GenerateContentConfig(
-                    system_instruction=sys_prompt,
-                    temperature=0.0
+        attempts = 0
+        while attempts < len(self.api_keys):
+            try:
+                from google.genai import types
+                response = await self.client.aio.models.generate_content(
+                    model='gemini-2.5-flash-lite',
+                    contents=text,
+                    config=types.GenerateContentConfig(
+                        system_instruction=sys_prompt,
+                        temperature=0.0
+                    )
                 )
-            )
-            if response.text:
-                return response.text.strip()
-            return text
-        except Exception as e:
-            print(f"ERROR:LLM correction failed: {e}", flush=True)
-            return text
+                if response.text:
+                    return response.text.strip()
+                return text
+            except Exception as e:
+                err_str = str(e)
+                print(f"ERROR:LLM correction failed on key idx {self.current_idx}: {err_str}", flush=True)
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "Quota" in err_str or "400" in err_str:
+                    attempts += 1
+                    if attempts < len(self.api_keys):
+                        self.current_idx = (self.current_idx + 1) % len(self.api_keys)
+                        self._init_client()
+                        continue
+                return text
+        return text
 
 corrector = AsyncLLMCorrector()

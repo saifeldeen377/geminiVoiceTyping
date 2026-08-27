@@ -156,7 +156,7 @@ class Transcriber:
             api_key=api_key,
         )
         
-        corrector.setup(client)
+        corrector.setup(self.api_keys)
 
         self.out_queue = asyncio.Queue(maxsize=40)
         self._stream = sd.InputStream(
