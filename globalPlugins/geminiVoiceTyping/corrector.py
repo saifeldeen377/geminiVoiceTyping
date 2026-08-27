@@ -20,7 +20,7 @@ class AsyncLLMCorrector:
         if not text or not self.client:
             return text
             
-        sys_prompt = "أنت مصحح إملائي محترف. مهمتك الوحيدة هي أخذ نص المستخدم وتصحيحه إملائياً، مع التركيز الصارم جداً على تحويل الهاء (ه) إلى تاء مربوطة (ة) في الكلمات المؤنثة. لا تضف أي شرح أو علامات ترقيم، فقط أعد النص المصحح."
+        sys_prompt = "You are a strict Arabic text corrector. Your ONLY job is to fix spelling mistakes in the input text. Specifically, you MUST replace every incorrect Haa (ه) at the end of nouns with a Taa Marbouta (ة). For example, change الاضافه to الإضافة, and مدرسه to مدرسة. Return ONLY the corrected Arabic text and nothing else."
         
         try:
             from google.genai import types
@@ -36,7 +36,7 @@ class AsyncLLMCorrector:
                 return response.text.strip()
             return text
         except Exception as e:
-            logger.error(f"LLM correction failed: {e}")
+            print(f"ERROR:LLM correction failed: {e}", flush=True)
             return text
 
 corrector = AsyncLLMCorrector()
