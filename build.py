@@ -38,7 +38,7 @@ def build_addon():
     version = info.get("version", "1.0.0")
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    addon_filename = f"{name}-{version}.nvda-addon"
+    addon_filename = f"{name}.nvda-addon"
     addon_path = os.path.join(OUTPUT_DIR, addon_filename)
 
     print(f"Building {addon_filename} ...")
