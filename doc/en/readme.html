@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,9 +28,22 @@
 </ul>
 <h2>Keyboard Shortcuts</h2>
 <ul>
-<li><strong>NVDA + Shift + G:</strong> Start / Stop Voice Typing</li>
+<li><strong>NVDA + Shift + G:</strong> Start / Stop Voice Typing (Normal Mode)</li>
+<li><strong>NVDA + Alt + G:</strong> Toggle Manual Commit Mode</li>
+<li><strong>Enter or Space:</strong> Commit (paste) accumulated speech <em>(only while Manual Commit Mode is active)</em></li>
+<li><strong>Escape:</strong> Exit Manual Commit Mode without pasting</li>
 </ul>
-<p><em>(You can reassign this via NVDA -> Preferences -> Input Gestures -> Gemini Voice Typing)</em></p>
+<p><em>(You can reassign these via NVDA -> Preferences -> Input Gestures -> Gemini Voice Typing)</em></p>
+
+<h2>Manual Commit Mode</h2>
+<p>Manual Commit Mode lets you review what you've said before it gets typed. When active:</p>
+<ol>
+<li>The microphone listens and accumulates your speech in the background.</li>
+<li>Nothing is typed until you press <strong>Enter</strong> or <strong>Space</strong> to commit.</li>
+<li>Press <strong>Escape</strong> to exit Manual Commit Mode and discard uncommitted text.</li>
+</ol>
+<p>This mode is useful when you want more control over what gets typed, for example in chat applications or when composing important messages.</p>
+<p><em>Note: Enter, Space, and Escape only have special behavior while Manual Commit Mode is active. Outside of it, they work normally with no interference.</em></p>
 <h2>Settings & Configuration</h2>
 <ol>
 <li>Open NVDA Menu (NVDA + N) -> Preferences -> Settings.</li>
