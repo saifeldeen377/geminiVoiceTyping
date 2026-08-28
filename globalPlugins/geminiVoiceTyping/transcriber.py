@@ -50,7 +50,7 @@ class Transcriber:
             pass
 
     async def send_audio(self):
-        while self.running and not getattr(self, 'stopping', False):
+        while self.running:
             try:
                 pcm_data = await asyncio.wait_for(self.out_queue.get(), timeout=0.3)
             except asyncio.TimeoutError:
@@ -140,8 +140,6 @@ class Transcriber:
                 self.running = False
                 break
             if not line or line.strip().upper() == "STOP":
-                self.stopping = True
-                await asyncio.sleep(1.0) # Allow API to finish transcribing the last audio frames
                 self.running = False
                 await self._flush_text()
                 break
