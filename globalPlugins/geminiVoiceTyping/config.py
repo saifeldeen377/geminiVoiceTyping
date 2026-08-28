@@ -22,7 +22,8 @@ DEFAULT_CONFIG = {
     "beep_on_key_rotation": False,
     "copy_to_clipboard": False,
     "system_prompt": "You are a highly accurate, verbatim multilingual dictation tool. You will hear Arabic and English speech. Your ONLY job is to transcribe exactly what the user says, word for word. Do NOT correct grammar. Do NOT translate. Do NOT summarize or drop any words. Preserve all colloquial dialects and English words exactly as spoken. Output exactly what you hear.",
-    "corrector_prompt": "Read this text and if there is a spelling or grammar error, correct it. CRITICAL: Preserve all languages, colloquial dialects (like Egyptian Arabic), and English words exactly as spoken.\nIt's normal to find more than 1 language in the same sentence, so don't ignore any text in any language.\nDo NOT translate. If the text is already correct, error-free, and well-punctuated, return it EXACTLY as is without any changes. Only output the final text, no conversational response."
+    "corrector_prompt": "Read this text and if there is a spelling or grammar error, correct it. CRITICAL: Preserve all languages, colloquial dialects (like Egyptian Arabic), and English words exactly as spoken.\nIt's normal to find more than 1 language in the same sentence, so don't ignore any text in any language.\nDo NOT translate. If the text is already correct, error-free, and well-punctuated, return it EXACTLY as is without any changes. Only output the final text, no conversational response.",
+    "smart_shutdown_delay": True
 }
 
 logger = logging.getLogger("geminiVoiceTyping.config")

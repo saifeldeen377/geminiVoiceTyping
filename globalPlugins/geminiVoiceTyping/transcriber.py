@@ -140,8 +140,9 @@ class Transcriber:
                 self.running = False
                 break
             if not line or line.strip().upper() == "STOP":
-                self.stopping = True
-                await asyncio.sleep(1.0) # Allow API to finish transcribing the last audio frames
+                if config_mgr.get("smart_shutdown_delay", True):
+                    self.stopping = True
+                    await asyncio.sleep(1.0) # Allow API to finish transcribing the last audio frames
                 self.running = False
                 await self._flush_text()
                 break

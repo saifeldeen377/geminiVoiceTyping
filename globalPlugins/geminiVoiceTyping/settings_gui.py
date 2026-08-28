@@ -41,6 +41,11 @@ if _has_gui:
             )
             self.copyClipboardCheckbox.SetValue(config.get("copy_to_clipboard", False))
             
+            self.smartShutdownCheckbox = sHelper.addItem(
+                wx.CheckBox(self, label="Smart Shutdown (Wait 1 sec to paste final words when closing mic)")
+            )
+            self.smartShutdownCheckbox.SetValue(config.get("smart_shutdown_delay", True))
+            
             # Transcription Prompt text control
             promptLabel = wx.StaticText(self, label="Transcription Prompt (Gemini Live API):")
             settingsSizer.Add(promptLabel, 0, wx.ALL, 5)
@@ -59,6 +64,7 @@ if _has_gui:
             config.set("api_keys", self.apiKeysCtrl.GetValue().strip())
             config.set("beep_on_key_rotation", self.beepOnRotateCheckbox.GetValue())
             config.set("copy_to_clipboard", self.copyClipboardCheckbox.GetValue())
+            config.set("smart_shutdown_delay", self.smartShutdownCheckbox.GetValue())
             config.set("system_prompt", self.promptCtrl.GetValue())
             config.set("corrector_prompt", self.correctorPromptCtrl.GetValue())
 
