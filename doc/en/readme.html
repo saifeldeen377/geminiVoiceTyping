@@ -6,29 +6,28 @@
 </head>
 <body>
 <h1>Gemini Voice Typing for NVDA</h1>
-<p>Ultra-fast, real-time speech-to-text dictation add-on for the NVDA screen reader powered by Google Gemini Live API. Specifically tuned for highly accurate bilingual (Arabic & English) voice typing.</p>
+<p>An NVDA add-on that provides high-quality, multilingual voice typing using the Google Gemini Live API. Features real-time dictation with advanced AI-powered spelling and grammar correction.</p>
 <h2>Features</h2>
 <ul>
-<li><strong>Real-Time Dictation:</strong> Streams audio directly to Gemini Live API and injects transcribed words into the active field as you speak.</li>
-<li><strong>Stealth Paste Mode:</strong> Injects text with extreme speed and accuracy using a smart clipboard bypass. It respects clipboard managers (like ClipHistory and Windows Win+V) by temporarily hiding the text so it never pollutes your clipboard history. This is the default behavior, but you can opt to copy text to your clipboard in the settings.</li>
-<li><strong>Multilingual Excellence:</strong> Effortlessly switches between languages. It is heavily tuned to follow strict Arabic spelling rules. You can seamlessly mix Arabic and English in the same sentence.</li>
-<li><strong>Multi-Key Failover:</strong> Put multiple Gemini API keys separated by commas (e.g. <code>key1, key2, key3</code>). If a key hits a rate limit or runs out of quota, the add-on automatically switches to the next key.</li>
-<li><strong>Accessible Earcons:</strong> Clear audio feedback for start, stop, errors, and an optional double-tone for automatic API key rotation.</li>
-<li><strong>Universal Compatibility:</strong> Works across all text fields, editors, and Windows apps without restricting where you can type.</li>
+<li><strong>Lightning Fast:</strong> Uses Gemini Live API for real-time streaming recognition.</li>
+<li><strong>Silent Typing:</strong> Directly types into the text field without NVDA repeatedly announcing every word.</li>
+<li><strong>Dialect Preservation:</strong> Corrects spelling and punctuation without aggressively altering colloquial dialects (e.g., Egyptian Arabic).</li>
+<li><strong>Auto Key Rotation:</strong> Input multiple API keys. If one runs out of quota, it instantly fails over to the next without dropping your dictation.</li>
+<li><strong>Customizable AI Prompts:</strong> Full control over the AI prompts used for both transcription and spelling correction via settings!</li>
 </ul>
 <h2>Keyboard Shortcuts</h2>
 <ul>
 <li><strong>NVDA + Shift + G:</strong> Start / Stop Voice Typing</li>
 </ul>
-<p><em>(You can also customize the shortcut in NVDA Menu -&gt; Preferences -&gt; Input Gestures -&gt; Gemini Voice Typing)</em></p>
-<h2>Setup & Configuration</h2>
+<p><em>(You can reassign this via NVDA -> Preferences -> Input Gestures -> Gemini Voice Typing)</em></p>
+<h2>Settings & Configuration</h2>
 <ol>
-<li>Open NVDA Settings: Press <strong>NVDA + N</strong>, then go to <strong>Preferences -&gt; Settings</strong>.</li>
-<li>Navigate to <strong>Gemini Voice Typing</strong> in the categories list.</li>
-<li>In <strong>Gemini API Keys</strong>, enter one or more API keys separated by commas.</li>
-<li>(Optional) Enable the checkbox to play a double-beep sound when automatically switching to another API key.</li>
-<li>(Optional) Enable "Auto copy result to clipboard" if you want your dictated text to be saved in your clipboard manager's history.</li>
-<li>Click <strong>OK</strong> to save.</li>
+<li>Open NVDA Menu (NVDA + N) -> Preferences -> Settings.</li>
+<li>Select <strong>Gemini Voice Typing</strong> from the categories list.</li>
+<li>In the <strong>Gemini API Keys</strong> field, paste your API keys (separated by commas).</li>
+<li><strong>Transcription Prompt:</strong> Modify the system instructions for the Live listening model.</li>
+<li><strong>Correction Prompt:</strong> Modify the system instructions for the fast spell-checker model (Flash Lite).</li>
+<li>Click <strong>OK</strong>.</li>
 </ol>
 </body>
 </html>

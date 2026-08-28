@@ -121,9 +121,6 @@ class Transcriber:
                         if model_turn:
                             # The model finalized a chunk of speech. Flush accumulated text immediately!
                             await self._flush_text()
-                            # Reset the tracking state so the next chunk starts fresh!
-                            self._current_text = ""
-                            self._flushed_text = ""
                                     
                     except Exception:
                         pass

@@ -34,7 +34,7 @@ class AsyncLLMCorrector:
         if not text or not self.client:
             return text
             
-        sys_prompt = "Read this text and if there is a spelling error, correct it; and if there is a grammar error, correct it too. Ensure incorrect Haa (ه) at the end of nouns is replaced with Taa Marbouta (ة). CRITICAL: Preserve colloquial dialects (like Egyptian Arabic) exactly as spoken, DO NOT translate to Modern Standard Arabic (Fusha). Do NOT translate or remove English words. Only output the corrected text, no additional conversational response needed, just the corrected text."
+        sys_prompt = config.get("corrector_prompt")
         
         attempts = 0
         while attempts < len(self.api_keys):
