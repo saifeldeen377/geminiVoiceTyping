@@ -45,6 +45,7 @@ if _has_gui:
                 wx.CheckBox(self, label="Smart Shutdown (Wait 1 sec to paste final words when closing mic)")
             )
             self.smartShutdownCheckbox.SetValue(config.get("smart_shutdown_delay", True))
+
             
             # Transcription Prompt text control
             promptLabel = wx.StaticText(self, label="Transcription Prompt (Gemini Live API):")

@@ -283,16 +283,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             pass
 
     # ── Manual Commit Mode ───────────────────────────────
-    def _manual_mode_allowed(self):
-        return bool(config.get("manual_mode_enabled", True))
-
     def _toggle_manual_mode_worker(self):
-        if not self._manual_mode_allowed():
-            if _in_nvda:
-                tones.beep(200, 120)
-                ui.message("Manual Commit Mode is disabled in Gemini Voice Typing settings.")
-            return
-
         if self._is_active:
             if self._mode == "manual":
                 self._do_stop()
