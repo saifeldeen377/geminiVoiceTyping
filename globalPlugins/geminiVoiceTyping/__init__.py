@@ -303,7 +303,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def script_manualCommit(self, gesture):
         if self._is_active and self._mode == "manual":
-            self._send_command("COMMIT")
+            if self._proc and self._proc.stdin:
+                try:
+                    self._proc.stdin.write(b"COMMIT\n")
+                    self._proc.stdin.flush()
+                except Exception:
+                    pass
             return
         gesture.send()
 
