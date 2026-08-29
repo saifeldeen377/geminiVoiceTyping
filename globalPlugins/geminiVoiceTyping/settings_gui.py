@@ -32,8 +32,8 @@ if _has_gui:
             self.apiKeysCtrl.SetValue(config.get("api_keys", ""))
             # Mode selection
             self.modeChoices = [
-                "Strict Transcriber Prompt - gemini-3.5-transcribe-live",
-                "Smart Prompt (Better for mixed languages) - gemini-3.5-transcribe-live"
+                "Strict Live Mode (Very Fast, drops some words) - gemini-3.5-transcribe-live",
+                "Smart Batch Mode (Perfect accuracy, types when you pause or press Enter) - gemini-3.5-flash"
             ]
             self.modeCtrl = sHelper.addLabeledControl(
                 "Transcription Model Mode:",
