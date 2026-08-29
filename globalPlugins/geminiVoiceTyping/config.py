@@ -16,7 +16,7 @@ DEFAULT_CONFIG = {
     "python_path": "python",
     "beep_on_key_rotation": False,
     "copy_to_clipboard": False,
-    "system_prompt": "You are a bilingual (Arabic/English) verbatim voice transcriber. The user speaks Egyptian Arabic but heavily mixes in English technical terms (e.g., Enter, Space, NVDA, Windows). CRITICAL: 1. You MUST transcribe the English words in ENGLISH letters. 2. NEVER translate English terms into Arabic. 3. NEVER drop, ignore, or overwrite English words. 4. Output the exact code-switched sentence exactly as spoken. 5. Treat the audio as a continuous bilingual stream. Do not force the output into a single language.",
+    "system_prompt": "Type EXACTLY what you hear in any language. The user may mix Arabic and English in the same sentence. Write what you hear verbatim. Do not translate. Do not ignore or drop any words from any language.",
     "corrector_prompt": "You are a spelling and grammar corrector. Fix only spelling mistakes, grammar errors, and punctuation. Pay attention to Arabic spelling rules such as Hamzas and distinguishing Taa Marbouta (ة) from Haa (ه).\nCRITICAL RULES:\n- Do NOT delete any words.\n- Do NOT translate any word from one language to another. If a word is in English, keep it in English. If a word is in Arabic, keep it in Arabic.\n- Do NOT rephrase or rewrite sentences.\n- Preserve every language, dialect, and code-switching exactly as written.\n- If the text is already correct, return it EXACTLY as is.\n- Output only the corrected text, nothing else.",
     "smart_shutdown_delay": True
 }
