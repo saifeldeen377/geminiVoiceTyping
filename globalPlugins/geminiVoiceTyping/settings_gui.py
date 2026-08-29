@@ -30,11 +30,10 @@ if _has_gui:
                 wx.TextCtrl,
             )
             self.apiKeysCtrl.SetValue(config.get("api_keys", ""))
-            
             # Mode selection
             self.modeChoices = [
                 "Strict Transcriber (Very Fast) - gemini-3.5-transcribe-live",
-                "Smart Multimodal (Better for mixed languages) - gemini-3.5-flash"
+                "Smart Multimodal (Better for mixed languages) - gemini-2.5-flash-native-audio"
             ]
             self.modeCtrl = sHelper.addLabeledControl(
                 "Transcription Model Mode:",
