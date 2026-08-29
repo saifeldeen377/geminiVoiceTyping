@@ -55,3 +55,4 @@ Unlike traditional voice typing tools, **Gemini Voice Typing** uses advanced Lar
 - **Pause Briefly:** For the best accuracy, speak in natural phrases and pause briefly (about 1 second) after each thought.
 - **Wait for NVDA:** Wait until NVDA announces the pasted text before starting your next sentence to prevent audio overlapping.
 - **Switching Modes:** If you change the model or corrector settings while the microphone is already active, you must stop and restart voice typing (NVDA + Shift + G) for the new AI prompts to take effect.
+
