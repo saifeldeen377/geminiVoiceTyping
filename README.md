@@ -18,6 +18,17 @@ Specifically tuned for highly accurate bilingual (Arabic & English) voice typing
   - Low error beep if an issue occurs.
 - **Universal Compatibility**: Works across all text fields, editors, and Windows apps without restricting where you can type.
 
+
+## 💡 Tips for Bilingual Dictation (Code-Switching)
+
+While the add-on supports dictating in both Arabic and English, the underlying AI model might occasionally drop or mistranslate words if you heavily mix both languages within a single continuous breath. 
+
+**For the best results when mixing languages:**
+1. **Auto Mode (Default):** Speak the first language sentence, pause for a moment to let the add-on paste the text, and then speak the sentence in the second language.
+2. **Manual Mode (\NVDA+Alt+G\):** Dictate the first language, press \Enter\ to commit/paste the text, and then dictate the next language. 
+
+By separating deeply mixed sentences with a short pause or a manual commit, you prevent the AI from confusing the context and dropping words!
+
 ---
 
 ## Keyboard Shortcuts
