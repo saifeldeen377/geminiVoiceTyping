@@ -99,11 +99,13 @@ class Transcriber:
     async def send_audio(self):
         while self.running and not self.stopping:
             try:
-                data = await asyncio.to_thread(self.out_queue.get)
+                data = await self.out_queue.get()
                 if data:
                     if self.mode_str == "strict" and self.session:
                         try:
-                            await self.session.send(input={"data": data, "mime_type": "audio/pcm;rate=16000"})
+                            await self.session.send_realtime_input(
+                                client_content={"turns": [{"parts": [{"inline_data": {"mime_type": "audio/pcm;rate=16000", "data": data}}]}]}
+                            )
                         except Exception as e:
                             self._emit(f"ERROR:Send failed: {e}")
                             self.running = False
