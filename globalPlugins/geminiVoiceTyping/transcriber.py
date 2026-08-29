@@ -78,10 +78,10 @@ class Transcriber:
         
         c_rms = rms(data)
         if not hasattr(self, 'noise_floor'):
-            self.noise_floor = 500.0
+            self.noise_floor = 300.0
             self.chunk_rms_history = []
             
-        if c_rms < self.noise_floor * 3.0 or c_rms < 1500.0:
+        if c_rms < self.noise_floor * 2.0:
             self.noise_floor = 0.95 * self.noise_floor + 0.05 * c_rms
             
         self.chunk_rms_history.append(c_rms)
@@ -129,7 +129,7 @@ class Transcriber:
                     # Smart mode adaptive silence detection
                     if hasattr(self, 'chunk_rms_history') and len(self.chunk_rms_history) >= 10:
                         last_10 = self.chunk_rms_history[-10:]
-                        threshold = max(self.noise_floor * 2.5, 600.0) # increased min threshold to 600 to prevent getting stuck
+                        threshold = max(self.noise_floor * 1.5 + 200.0, 500.0)
                         
                         if all(r < threshold for r in last_10) and not self.is_flushing_batch:
                             buffer_sec = len(self.batch_audio_buffer) / SAMPLE_RATE
