@@ -8,6 +8,17 @@ import time
 
 from config import config as config_mgr
 from corrector import corrector
+import datetime
+
+DEBUG_FILE = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "nvda", "gemini_debug.log")
+def debug_log(msg):
+    try:
+        with open(DEBUG_FILE, "a", encoding="utf-8") as f:
+            f.write(f"[{datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3]}] {msg}\n")
+    except:
+        pass
+
+debug_log("=== TRANSCRIBER STARTED ===")
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -36,9 +47,13 @@ class Transcriber:
         self.running = True
         self._stream = None
         
+        # In manual mode, finalized speech is accumulated here until COMMIT.
         self._current_text = ""
+        self._manual_buffer = ""
         self._flushed_text = ""
         self._last_update_time = time.time()
+        self._commit_lock = asyncio.Lock()
+        self.manual_mode = "--manual" in sys.argv[2:]
 
     def _audio_callback(self, indata, frames, time_info, status):
         if not self.running or self.out_queue is None:
@@ -73,24 +88,61 @@ class Transcriber:
             await asyncio.sleep(0.2)
             if self._current_text:
                 if time.time() - self._last_update_time > 1.0:
-                    await self._flush_text()
+                    if self.manual_mode:
+                        async with self._commit_lock:
+                            if self._current_text:
+                                self._append_manual_segment(self._current_text)
+                                self._current_text = ""
+                    else:
+                        await self._flush_text()
 
     async def _flush_text(self):
-        if not self._current_text:
+        """Flush text according to the active mode."""
+        async with self._commit_lock:
+            if self.manual_mode:
+                # Move the latest live segment into the persistent manual buffer.
+                if self._current_text:
+                    self._append_manual_segment(self._current_text)
+                    self._current_text = ""
+
+                text = self._manual_buffer.strip()
+                if not text:
+                    return
+
+                self._manual_buffer = ""
+                debug_log(f"MANUAL SEND TO CORRECTOR: '{text}'")
+                corrected = await corrector.correct_sentence(text)
+                debug_log(f"MANUAL CORRECTOR RETURNED: '{corrected}'")
+                if corrected:
+                    self._emit(f"TEXT:{corrected} ")
+                return
+
+            if not self._current_text:
+                return
+
+            diff = ""
+            if self._current_text.startswith(self._flushed_text):
+                diff = self._current_text[len(self._flushed_text):].strip()
+            else:
+                diff = self._current_text.strip()
+
+            if diff:
+                debug_log(f"NORMAL SEND TO CORRECTOR (Diff): '{diff}' [Full text was: '{self._current_text}']")
+                corrected_diff = await corrector.correct_sentence(diff)
+                debug_log(f"NORMAL CORRECTOR RETURNED: '{corrected_diff}'")
+                self._emit(f"TEXT:{corrected_diff} ")
+
+            self._flushed_text = self._current_text
+            self._last_update_time = time.time()
+
+    def _append_manual_segment(self, text):
+        text = text.strip()
+        if not text:
             return
-            
-        diff = ""
-        if self._current_text.startswith(self._flushed_text):
-            diff = self._current_text[len(self._flushed_text):].strip()
-        else:
-            diff = self._current_text.strip()
-            
-        if diff:
-            corrected_diff = await corrector.correct_sentence(diff)
-            self._emit(f"TEXT:{corrected_diff} ")
-            
-        self._flushed_text = self._current_text
-        self._last_update_time = time.time() 
+        if not self._manual_buffer:
+            self._manual_buffer = text
+        elif not self._manual_buffer.endswith(text):
+            self._manual_buffer += " " + text
 
     async def receive_text(self):
         while self.running:
@@ -111,17 +163,31 @@ class Transcriber:
                         if interim:
                             t = getattr(interim, "text", "")
                             if t:
-                                clean = t.strip(" .")
+                                clean = t.strip(" .\n\r")
                                 if clean:
-                                    if clean != self._current_text:
-                                        self._current_text = clean
-                                        self._last_update_time = time.time()
-                                        
+                                    debug_log(f"API Interim: '{clean}'")
+                                    # Gemini's interim transcript is normally a
+                                    # replacement for the current speech segment.
+                                    self._current_text = clean
+                                    self._last_update_time = time.time()
+
+                        # A completed turn marks the end of the current speech
+                        # segment. In manual mode we retain it instead of typing it.
+                        if getattr(sc, "turn_complete", False):
+                            debug_log(f"API Turn Complete! Final segment text: '{self._current_text}'")
+                            if self.manual_mode:
+                                if self._current_text:
+                                    self._append_manual_segment(self._current_text)
+                                    self._current_text = ""
+                            else:
+                                await self._flush_text()
+
+                        # Keep the original normal-mode behavior as a fallback
+                        # for model turn completion events.
                         model_turn = getattr(sc, "model_turn", None)
-                        if model_turn:
-                            # The model finalized a chunk of speech. Flush accumulated text immediately!
+                        if model_turn and not self.manual_mode:
                             await self._flush_text()
-                                    
+
                     except Exception:
                         pass
             except asyncio.CancelledError:
@@ -139,11 +205,20 @@ class Transcriber:
             except Exception:
                 self.running = False
                 break
-            if not line or line.strip().upper() == "STOP":
+
+            command = line.strip().upper() if line else "STOP"
+
+            if command == "COMMIT":
+                if self.manual_mode:
+                    await self._flush_text()
+                continue
+
+            if command == "STOP":
                 if config_mgr.get("smart_shutdown_delay", True):
                     self.stopping = True
-                    await asyncio.sleep(1.0) # Allow API to finish transcribing the last audio frames
+                    await asyncio.sleep(1.0)
                 self.running = False
+                # Never lose the final manual segment when stopping.
                 await self._flush_text()
                 break
 
