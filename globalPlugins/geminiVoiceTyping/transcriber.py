@@ -195,7 +195,7 @@ class Transcriber:
                 wav_bytes = wav_io.getvalue()
                 
                 response = await self.client.aio.models.generate_content(
-                    model='gemini-3.5-flash',
+                    model='gemini-3.5-flash-lite',
                     contents=[
                         types.Part.from_bytes(data=wav_bytes, mime_type='audio/wav'),
                         self.batch_prompt

@@ -33,7 +33,7 @@ if _has_gui:
             # Mode selection
             self.modeChoices = [
                 "Strict Live Mode (Very Fast, drops some words) - gemini-3.5-transcribe-live",
-                "Smart Batch Mode (Perfect accuracy, types when you pause or press Enter) - gemini-3.5-flash"
+                "Smart Batch Mode (Perfect accuracy, types when you pause or press Enter) - gemini-3.5-flash-lite"
             ]
             self.modeCtrl = sHelper.addLabeledControl(
                 "Transcription Model Mode:",
