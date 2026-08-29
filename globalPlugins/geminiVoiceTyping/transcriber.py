@@ -76,6 +76,18 @@ class Transcriber:
             pass
         data = indata.tobytes()
         
+        c_rms = rms(data)
+        if not hasattr(self, 'noise_floor'):
+            self.noise_floor = 500.0
+            self.chunk_rms_history = []
+            
+        if c_rms < self.noise_floor * 2.5:
+            self.noise_floor = 0.95 * self.noise_floor + 0.05 * c_rms
+            
+        self.chunk_rms_history.append(c_rms)
+        if len(self.chunk_rms_history) > 50:
+            self.chunk_rms_history.pop(0)
+        
         if self.mode_str == "smart":
             self.batch_audio_buffer.extend(data)
             
@@ -121,15 +133,24 @@ class Transcriber:
                         if time.time() - self._last_update_time > 2.0:
                             await self._flush_text()
                 else:
-                    # Smart mode silence detection
-                    # we check the last 1.5 seconds of audio buffer.
-                    if len(self.batch_audio_buffer) > int(SAMPLE_RATE * 2.0): # 2.0 seconds of audio
-                        last_sec = self.batch_audio_buffer[-int(SAMPLE_RATE * 2.0):]
-                        current_rms = rms(last_sec)
-                        if current_rms < silence_threshold and not self.is_flushing_batch:
-                            # It's silent! Let's flush!
-                            await self._flush_text()
-                            
+                    # Smart mode adaptive silence detection
+                    if hasattr(self, 'chunk_rms_history') and len(self.chunk_rms_history) >= 20:
+                        # 20 chunks = 2.0 seconds of audio
+                        last_20 = self.chunk_rms_history[-20:]
+                        threshold = max(self.noise_floor * 2.5, 300.0)
+                        
+                        if all(r < threshold for r in last_20) and not self.is_flushing_batch:
+                            # It's been silent for 2 seconds.
+                            # Did we have loud speech before this?
+                            buffer_sec = len(self.batch_audio_buffer) / SAMPLE_RATE
+                            if buffer_sec > 2.0:
+                                # We have audio older than the 2s of silence. Was there speech in it?
+                                # If any chunk in the history was > threshold, it's speech!
+                                if any(r > threshold for r in self.chunk_rms_history):
+                                    await self._flush_text()
+                                else:
+                                    # It's just background noise. Clear buffer so it doesn't grow forever.
+                                    self.batch_audio_buffer = bytearray()
             except asyncio.CancelledError:
                 break
             except Exception as e:
