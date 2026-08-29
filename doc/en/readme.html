@@ -6,49 +6,52 @@
 </head>
 <body>
 <h1>Gemini Voice Typing for NVDA</h1>
-<p>An NVDA add-on that provides high-quality, multilingual voice typing using the Google Gemini APIs. Features real-time dictation, an intelligent batch transcription mode, and advanced AI-powered spelling and grammar correction.</p>
 
-<h2>Transcription Modes</h2>
-<p>This add-on offers two powerful transcription models to suit your needs:</p>
-<ol>
-<li><strong>Strict Live Mode (Very Fast):</strong> Powered by <code>gemini-3.5-transcribe-live</code>. This is a real-time streaming mode. It types instantly as you speak, word-by-word. It is extremely fast and great for general dictation.</li>
-<li><strong>Smart Batch Mode (Perfect Accuracy):</strong> Powered by <code>gemini-3.5-flash-lite</code>. This mode collects your speech and waits for you to pause (for 1 second) or press Enter. It analyzes the entire sentence to apply perfect formatting, grammar, and flawlessly mixes English and Arabic words. It takes slightly longer but delivers impeccable results.</li>
-</ol>
-<p>You can seamlessly toggle between these modes using <code>NVDA + Alt + Shift + G</code>. <em>(Note: If you toggle the mode while the microphone is already active, you must stop and restart voice typing for the new mode and its specific AI prompts to take effect.)</em></p>
+<h2>The Problem</h2>
+<p>For blind and visually impaired users, typing long texts, writing code, or seamlessly switching between languages (like Arabic and English) using a keyboard can be time-consuming and tedious. Traditional voice dictation tools often fall short: they struggle with heavy accents, fail miserably when mixing multiple languages in the same sentence, type with noticeable latency, or aggressively filter out colloquial dialects. Furthermore, many dictation tools pollute the system clipboard or constantly trigger screen reader announcements that interrupt the user's train of thought.</p>
 
-<h2>Manual Commit Mode</h2>
-<p>By default, the add-on types automatically when you pause. However, if you want full control over when the text is inserted, you can activate <strong>Manual Commit Mode</strong> using <code>NVDA + Alt + G</code>.</p>
-<p>When Manual Commit Mode is active:</p>
+<h2>The Solution</h2>
+<p><strong>Gemini Voice Typing</strong> is an NVDA add-on that completely solves this problem by harnessing the power of Google's advanced Gemini AI. It acts as an ultra-fast, highly accurate dictation assistant that types directly into your active text field. It seamlessly handles complex bilingual code-switching (e.g., dictating in Arabic and English simultaneously) without transliteration errors. With dedicated smart AI corrector models, it instantly fixes your grammar and spelling, ensuring your dictated text is impeccably formatted before it even reaches your screen.</p>
+
+<h2>Setup & Configuration</h2>
 <ol>
-<li>The microphone listens and accumulates your speech in the background.</li>
-<li>Nothing is typed until you press <strong>Enter</strong> or <strong>Space</strong> to commit.</li>
-<li>Press <strong>Escape</strong> to exit Manual Commit Mode and discard uncommitted text.</li>
+<li>Download the latest <code>.nvda-addon</code> file from the repository's Releases page.</li>
+<li>Install it in NVDA and restart NVDA.</li>
+<li>Open NVDA Settings: Press <strong>NVDA + N</strong>, then go to <strong>Preferences -&gt; Settings</strong>.</li>
+<li>Navigate to <strong>Gemini Voice Typing</strong> in the categories list.</li>
+<li>In the <strong>Gemini API Keys</strong> field, enter one or more API keys separated by commas (You can generate a free API key from Google AI Studio).</li>
+<li>Select your preferred transcription mode and adjust the AI system prompts if desired.</li>
+<li>Click <strong>OK</strong> to save.</li>
 </ol>
-<p><em>Note: Enter, Space, and Escape only have special behavior while Manual Commit Mode is active.</em></p>
+
+<h2>Features</h2>
+<ul>
+<li><strong>Dual Transcription Engines:</strong>
+  <ul>
+    <li><strong>Strict Live Mode:</strong> A zero-latency real-time streaming mode powered by <code>gemini-3.5-transcribe-live</code>. It types instantly as you speak, word-by-word.</li>
+    <li><strong>Smart Batch Mode:</strong> Powered by <code>gemini-3.5-flash-lite</code>. It collects your speech and intelligently transcribes it when you pause, applying flawless grammar, formatting, and bilingual separation.</li>
+  </ul>
+</li>
+<li><strong>Manual Commit Mode:</strong> Gain full control over your dictation. Dictate freely in the background, and the text is only injected into your application when you explicitly press <code>Enter</code>.</li>
+<li><strong>AI Grammar & Spelling Corrector:</strong> Automatically cleans up, corrects, and formats your text before pasting it.</li>
+<li><strong>Stealth Paste Mode:</strong> Injects text with extreme speed without polluting your clipboard history (bypasses Windows Win+V and ClipHistory).</li>
+<li><strong>Multi-Key Failover:</strong> Input multiple Gemini API keys. If one runs out of quota, it instantly fails over to the next without dropping your dictation!</li>
+<li><strong>Accessible Audio Feedback:</strong> Intuitive earcons (chimes) for starting, stopping, API key rotation, and errors.</li>
+</ul>
 
 <h2>Keyboard Shortcuts</h2>
 <ul>
 <li><strong>NVDA + Shift + G:</strong> Start / Stop Voice Typing</li>
-<li><strong>NVDA + Alt + Shift + G:</strong> Toggle between Strict and Smart modes</li>
+<li><strong>NVDA + Alt + Shift + G:</strong> Toggle between Strict Mode and Smart Mode <em>(Note: If changed while recording, you must restart the microphone for the new mode to take effect)</em></li>
 <li><strong>NVDA + Alt + G:</strong> Toggle Manual Commit Mode</li>
 <li><strong>NVDA + G:</strong> Toggle the AI Grammar & Spelling Corrector On/Off</li>
 </ul>
-<p><em>(You can reassign these via NVDA -&gt; Preferences -&gt; Input Gestures -&gt; Gemini Voice Typing)</em></p>
-
-<h2>Best Practices</h2>
+<p><em>When Manual Commit Mode is active:</em></p>
 <ul>
-<li><strong>Speak in Short or Medium Phrases:</strong> For the best accuracy, dictate in natural sentences and pause briefly after each thought.</li>
-<li><strong>Wait for NVDA Announcement:</strong> After pausing or pressing Enter, wait until you hear NVDA announce the pasted text before starting your next sentence.</li>
+<li><strong>Enter or Space:</strong> Commit (paste) the accumulated speech</li>
+<li><strong>Escape:</strong> Exit Manual Commit Mode and discard uncommitted text</li>
 </ul>
+<p><em>(All shortcuts can be customized via NVDA Menu -&gt; Preferences -&gt; Input Gestures -&gt; Gemini Voice Typing)</em></p>
 
-<h2>Settings & Configuration</h2>
-<ol>
-<li>Open NVDA Menu (NVDA + N) -&gt; Preferences -&gt; Settings.</li>
-<li>Select <strong>Gemini Voice Typing</strong> from the categories list.</li>
-<li>In the <strong>Gemini API Keys</strong> field, paste your API keys (separated by commas).</li>
-<li>Select your preferred transcription mode and adjust the AI system prompts as desired.</li>
-<li>Click <strong>OK</strong>.</li>
-</ol>
 </body>
 </html>
-
