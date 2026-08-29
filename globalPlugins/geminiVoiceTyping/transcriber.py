@@ -117,8 +117,8 @@ class Transcriber:
                     continue
                     
                 if self.mode_str == "strict":
-                    if self._current_text != self._flushed_text:
-                        if time.time() - self._last_update_time > 1.0:
+                    if self._current_text or self._manual_buffer:
+                        if time.time() - self._last_update_time > 2.0:
                             await self._flush_text()
                 else:
                     # Smart mode silence detection
@@ -254,17 +254,10 @@ class Transcriber:
                                     self._current_text = clean
                                     self._last_update_time = time.time()
 
-                        if getattr(sc, "turn_complete", False):
-                            if self.manual_mode:
-                                if self._current_text:
-                                    self._append_manual_segment(self._current_text)
-                                    self._current_text = ""
-                            else:
-                                await self._flush_text()
-
-                        model_turn = getattr(sc, "model_turn", None)
-                        if model_turn and not self.manual_mode:
-                            await self._flush_text()
+                        if getattr(sc, "turn_complete", False) or getattr(sc, "model_turn", None):
+                            if self._current_text:
+                                self._append_manual_segment(self._current_text)
+                                self._current_text = ""
 
                     except Exception:
                         pass
