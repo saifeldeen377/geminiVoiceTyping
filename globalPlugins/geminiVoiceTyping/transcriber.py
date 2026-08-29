@@ -118,13 +118,13 @@ class Transcriber:
                     
                 if self.mode_str == "strict":
                     if self._current_text or self._manual_buffer:
-                        if time.time() - self._last_update_time > 1.0:
+                        if time.time() - self._last_update_time > 2.0:
                             await self._flush_text()
                 else:
                     # Smart mode silence detection
                     # we check the last 1.5 seconds of audio buffer.
-                    if len(self.batch_audio_buffer) > int(SAMPLE_RATE * 1.0): # 1.0 seconds of audio
-                        last_sec = self.batch_audio_buffer[-int(SAMPLE_RATE * 1.0):]
+                    if len(self.batch_audio_buffer) > int(SAMPLE_RATE * 2.0): # 2.0 seconds of audio
+                        last_sec = self.batch_audio_buffer[-int(SAMPLE_RATE * 2.0):]
                         current_rms = rms(last_sec)
                         if current_rms < silence_threshold and not self.is_flushing_batch:
                             # It's silent! Let's flush!
