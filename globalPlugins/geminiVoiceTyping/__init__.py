@@ -335,9 +335,32 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     script_toggleVoiceTyping.__doc__ = "Toggle Gemini Voice Typing"
 
+    def script_toggleModelMode(self, gesture):
+        """Toggle between Strict and Smart modes."""
+        current = config.get("transcription_mode", "strict")
+        new_mode = "smart" if current == "strict" else "strict"
+        config.set("transcription_mode", new_mode)
+        if _in_nvda:
+            ui.message(f"Voice Typing Mode: {new_mode.capitalize()}")
+            
+    script_toggleModelMode.__doc__ = "Toggle Gemini Voice Typing between Strict and Smart modes"
+    
+    def script_toggleCorrector(self, gesture):
+        """Toggle the AI corrector on or off."""
+        current = config.get("enable_corrector", True)
+        new_state = not current
+        config.set("enable_corrector", new_state)
+        state_str = "On" if new_state else "Off"
+        if _in_nvda:
+            ui.message(f"Voice Typing Corrector: {state_str}")
+
+    script_toggleCorrector.__doc__ = "Toggle Gemini Voice Typing Corrector on or off"
+
     # Only permanent gestures — Enter/Space/Escape are bound dynamically
     # via _bind_manual_gestures() when Manual Commit Mode starts.
     __gestures = {
         "kb:NVDA+shift+g": "toggleVoiceTyping",
         "kb:NVDA+alt+g": "toggleManualCommitMode",
+        "kb:NVDA+alt+shift+g": "toggleModelMode",
+        "kb:NVDA+g": "toggleCorrector",
     }
