@@ -47,7 +47,7 @@ def rms(data):
     return math.sqrt(sum_squares / count)
 
 class Transcriber:
-    def __init__(self, api_keys: list[str]):
+    def __init__(self, api_keys: list[str], manual_mode: bool = False):
         self.api_keys = api_keys
         self.running = True
         self.stopping = False
@@ -55,7 +55,7 @@ class Transcriber:
         self._stream = None
         self.out_queue = None
         
-        self.manual_mode = config_mgr.config.get("manual_mode_enabled", True)
+        self.manual_mode = manual_mode
         self.mode_str = config_mgr.config.get("transcription_mode", "strict")
 
         self._current_text = ""
@@ -98,7 +98,7 @@ class Transcriber:
                 break
 
     async def watch_silence(self):
-        silence_threshold = 500
+        silence_threshold = 1500
         silence_duration = 1.0
         consecutive_silent_chunks = 0
         chunks_needed = int(silence_duration / (CHUNK_DURATION_MS / 1000.0))
@@ -125,7 +125,8 @@ class Transcriber:
                     # we check the last 1.5 seconds of audio buffer.
                     if len(self.batch_audio_buffer) > int(SAMPLE_RATE * 1.5): # 1.5 seconds of audio
                         last_sec = self.batch_audio_buffer[-int(SAMPLE_RATE * 1.5):]
-                        if rms(last_sec) < silence_threshold and not self.is_flushing_batch:
+                        current_rms = rms(last_sec)
+                        if current_rms < silence_threshold and not self.is_flushing_batch:
                             # It's silent! Let's flush!
                             await self._flush_text()
                             
@@ -406,7 +407,7 @@ class Transcriber:
 
 def main():
     if len(sys.argv) < 2:
-        print("ERROR:Usage: transcriber.py key1,key2,...", flush=True)
+        print("ERROR:Usage: transcriber.py key1,key2,... [--manual]", flush=True)
         sys.exit(1)
 
     keys = [k.strip() for k in sys.argv[1].split(",") if k.strip()]
@@ -414,7 +415,8 @@ def main():
          print("ERROR:Please enter a valid API key.", flush=True)
          sys.exit(1)
 
-    t = Transcriber(keys)
+    manual_mode = "--manual" in sys.argv
+    t = Transcriber(keys, manual_mode=manual_mode)
     try:
         asyncio.run(t.run())
     except KeyboardInterrupt:
