@@ -104,7 +104,7 @@ class Transcriber:
                     if self.mode_str == "strict" and self.session:
                         try:
                             await self.session.send_realtime_input(
-                                client_content={"turns": [{"parts": [{"inline_data": {"mime_type": "audio/pcm;rate=16000", "data": data}}]}]}
+                                audio={"mime_type": "audio/pcm;rate=16000", "data": data}
                             )
                         except Exception as e:
                             self._emit(f"ERROR:Send failed: {e}")
