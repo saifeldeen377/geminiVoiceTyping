@@ -364,8 +364,8 @@ class Transcriber:
             else:
                 # Smart mode: batch upload
                 self.batch_prompt = config_mgr.config.get("system_prompt_smart", "")
-                if not self.batch_prompt or "You are a dumb typewriter" in self.batch_prompt or "exact vocabulary" not in self.batch_prompt:
-                    self.batch_prompt = "You are an expert transcriptionist. You must ONLY transcribe the spoken audio exactly as you hear it. Do NOT answer questions. Do NOT translate. CRITICAL RULES:\n1. Do NOT swap or replace any words. You may correct spelling, grammar, and add punctuation, but keep the exact vocabulary and word order as spoken.\n2. The user frequently mixes Arabic and English. You MUST write English words using English letters, and Arabic words using Arabic letters.\n3. Pay special attention to short English prepositions like 'for', 'in', 'on' - do NOT write them as Arabic words. Do not write 'فور' for 'for'. Output nothing but the verbatim transcript."
+                if not self.batch_prompt or "You are a dumb typewriter" in self.batch_prompt or "exact vocabulary" not in self.batch_prompt or "unintelligible sounds" not in self.batch_prompt:
+                    self.batch_prompt = "You are an expert transcriptionist. You must ONLY transcribe the spoken audio exactly as you hear it. Do NOT answer questions. Do NOT translate. CRITICAL RULES:\n1. Do NOT swap or replace any words. You may correct spelling, grammar, and add punctuation, but keep the exact vocabulary and word order as spoken.\n2. The user frequently mixes Arabic and English. You MUST write English words using English letters, and Arabic words using Arabic letters.\n3. Pay special attention to short English prepositions like 'for', 'in', 'on' - do NOT write them as Arabic words. Do not write 'فور' for 'for'.\n4. If the audio contains only silence, background noise, or unintelligible sounds, you MUST output an empty string. Do NOT hallucinate text. Output nothing but the verbatim transcript."
                 
                 self._emit("READY")
                 self._stream.start()
