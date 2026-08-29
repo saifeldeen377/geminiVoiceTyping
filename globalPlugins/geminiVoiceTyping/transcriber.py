@@ -161,10 +161,12 @@ class Transcriber:
                 diff = self._current_text.strip()
 
             if diff:
+                debug_log(f"Diff to corrector: {diff}")
                 if config_mgr.config.get("enable_corrector", True):
                     corrected_diff = await corrector.corrector.correct_sentence(diff)
                 else:
                     corrected_diff = diff
+                debug_log(f"Corrected diff: {corrected_diff}")
                 self._emit(f"TEXT:{corrected_diff} ")
 
             self._flushed_text = self._current_text
@@ -201,9 +203,11 @@ class Transcriber:
                 )
                 
                 text = response.text.strip()
+                debug_log(f"Batch generation returned: {text}")
                 if text:
                     if config_mgr.config.get("enable_corrector", True):
                         text = await corrector.corrector.correct_sentence(text)
+                    debug_log(f"Batch corrected to: {text}")
                     if text:
                         self._emit(f"TEXT:{text} ")
                         
@@ -245,6 +249,7 @@ class Transcriber:
                             if t:
                                 clean = t.strip(" .\n\r")
                                 if clean:
+                                    debug_log(f"API Interim: {clean}")
                                     self._current_text = clean
                                     self._last_update_time = time.time()
 
@@ -315,7 +320,7 @@ class Transcriber:
         self._stream = sd.InputStream(
             samplerate=SAMPLE_RATE,
             channels=CHANNELS,
-            dtype="float32",
+            dtype="int16",
             blocksize=CHUNK_SAMPLES,
             callback=self._audio_callback,
         )
