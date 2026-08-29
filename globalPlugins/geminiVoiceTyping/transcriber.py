@@ -81,7 +81,7 @@ class Transcriber:
             self.noise_floor = 500.0
             self.chunk_rms_history = []
             
-        if c_rms < self.noise_floor * 2.5:
+        if c_rms < self.noise_floor * 3.0 or c_rms < 1500.0:
             self.noise_floor = 0.95 * self.noise_floor + 0.05 * c_rms
             
         self.chunk_rms_history.append(c_rms)
@@ -99,62 +99,47 @@ class Transcriber:
     async def send_audio(self):
         while self.running and not self.stopping:
             try:
-                data = await self.out_queue.get()
-                if self.mode_str == "strict" and self.session:
-                    await self.session.send_realtime_input(
-                        client_content={"turns": [{"parts": [{"inline_data": {"mime_type": "audio/pcm;rate=16000", "data": data}}]}]}
-                    )
-            except asyncio.CancelledError:
-                break
+                data = await asyncio.to_thread(self.out_queue.get)
+                if data:
+                    if self.mode_str == "strict" and self.session:
+                        try:
+                            await self.session.send(input={"data": data, "mime_type": "audio/pcm;rate=16000"})
+                        except Exception as e:
+                            self._emit(f"ERROR:Send failed: {e}")
+                            self.running = False
+                            break
             except Exception:
                 break
 
     async def watch_silence(self):
-        silence_threshold = 1500
-        silence_duration = 1.0
-        consecutive_silent_chunks = 0
-        chunks_needed = int(silence_duration / (CHUNK_DURATION_MS / 1000.0))
-
         while self.running and not self.stopping:
             try:
-                # We peek at queue implicitly by consuming it in send_audio, but for rms we can just look at what send_audio got,
-                # wait, let's let send_audio handle the queue and we just do RMS in the callback?
-                # Actually, watch_silence can just check if time since last update > 1 second.
                 await asyncio.sleep(0.5)
-                
-                # In smart mode, we flush based on RMS silence of the buffer.
-                # In strict mode, we flush based on _last_update_time from the API.
                 
                 if self.manual_mode:
                     continue
                     
                 if self.mode_str == "strict":
                     if self._current_text or self._manual_buffer:
-                        if time.time() - self._last_update_time > 2.0:
+                        if time.time() - self._last_update_time > 1.5:
                             await self._flush_text()
                 else:
                     # Smart mode adaptive silence detection
                     if hasattr(self, 'chunk_rms_history') and len(self.chunk_rms_history) >= 20:
-                        # 20 chunks = 2.0 seconds of audio
                         last_20 = self.chunk_rms_history[-20:]
-                        threshold = max(self.noise_floor * 2.5, 300.0)
+                        threshold = max(self.noise_floor * 2.5, 600.0) # increased min threshold to 600 to prevent getting stuck
                         
                         if all(r < threshold for r in last_20) and not self.is_flushing_batch:
-                            # It's been silent for 2 seconds.
-                            # Did we have loud speech before this?
                             buffer_sec = len(self.batch_audio_buffer) / SAMPLE_RATE
                             if buffer_sec > 2.0:
-                                # We have audio older than the 2s of silence. Was there speech in it?
-                                # If any chunk in the history was > threshold, it's speech!
                                 if any(r > threshold for r in self.chunk_rms_history):
                                     await self._flush_text()
                                 else:
-                                    # It's just background noise. Clear buffer so it doesn't grow forever.
                                     self.batch_audio_buffer = bytearray()
             except asyncio.CancelledError:
                 break
-            except Exception as e:
-                debug_log(f"Silence error: {e}")
+            except Exception:
+                break
 
     async def _flush_text(self):
         if self.mode_str == "strict":
@@ -276,9 +261,20 @@ class Transcriber:
                                     self._last_update_time = time.time()
 
                         if getattr(sc, "turn_complete", False) or getattr(sc, "model_turn", None):
-                            if self._current_text:
-                                self._append_manual_segment(self._current_text)
-                                self._current_text = ""
+                            if self.manual_mode:
+                                if self._current_text:
+                                    self._append_manual_segment(self._current_text)
+                                    self._current_text = ""
+                            else:
+                                await self._flush_text()
+                        else:
+                            # Stream directly to NVDA in real-time
+                            if not self.manual_mode:
+                                new_text = self._current_text[len(self._flushed_text):]
+                                if new_text.strip():
+                                    if self.out_queue:
+                                        self._emit("TEXT:" + new_text + " ")
+                                    self._flushed_text = self._current_text
 
                     except Exception:
                         pass
