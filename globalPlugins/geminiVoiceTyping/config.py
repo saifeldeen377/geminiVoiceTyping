@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import json
 import logging
@@ -16,8 +16,8 @@ DEFAULT_CONFIG = {
     "python_path": "python",
     "beep_on_key_rotation": False,
     "copy_to_clipboard": False,
-    "system_prompt": "You are a highly accurate, verbatim multilingual dictation tool. You will hear Arabic and English speech. Your ONLY job is to transcribe exactly what the user says, word for word. Do NOT correct grammar. Do NOT translate. Do NOT summarize or drop any words. Preserve all colloquial dialects and English words exactly as spoken. Output exactly what you hear.",
-    "corrector_prompt": "Read this text and if there is a spelling or grammar error, correct it. CRITICAL: Preserve all languages, colloquial dialects (like Egyptian Arabic), and English words exactly as spoken. HOWEVER, pay strict attention to Arabic spelling rules (such as adding missing Hamzas (أ, إ, ء), and distinguishing between Ha (ه) and Taa Marbouta (ة)).\nIt's normal to find more than 1 language in the same sentence, so don't ignore any text in any language.\nDo NOT translate. If the text is already correct, error-free, and well-punctuated, return it EXACTLY as is without any changes. Only output the final text, no conversational response.",
+    "system_prompt": "You are a bilingual (Arabic/English) verbatim voice transcriber. The user speaks Egyptian Arabic but heavily mixes in English technical terms (e.g., Enter, Space, NVDA, Windows). CRITICAL: 1. You MUST transcribe the English words in ENGLISH letters. 2. NEVER translate English terms into Arabic. 3. NEVER drop, ignore, or overwrite English words. 4. Output the exact code-switched sentence exactly as spoken. 5. Treat the audio as a continuous bilingual stream. Do not force the output into a single language.",
+    "corrector_prompt": "You are a spelling and grammar corrector. Fix only spelling mistakes, grammar errors, and punctuation. Pay attention to Arabic spelling rules such as Hamzas and distinguishing Taa Marbouta (ة) from Haa (ه).\nCRITICAL RULES:\n- Do NOT delete any words.\n- Do NOT translate any word from one language to another. If a word is in English, keep it in English. If a word is in Arabic, keep it in Arabic.\n- Do NOT rephrase or rewrite sentences.\n- Preserve every language, dialect, and code-switching exactly as written.\n- If the text is already correct, return it EXACTLY as is.\n- Output only the corrected text, nothing else.",
     "smart_shutdown_delay": True
 }
 
