@@ -123,7 +123,7 @@ class Transcriber:
                     
                 if self.mode_str == "strict":
                     if self._current_text or self._manual_buffer:
-                        if time.time() - self._last_update_time > 1.5:
+                        if time.time() - self._last_update_time > 1.0:
                             await self._flush_text()
                 else:
                     # Smart mode adaptive silence detection
@@ -269,14 +269,6 @@ class Transcriber:
                                     self._current_text = ""
                             else:
                                 await self._flush_text()
-                        else:
-                            # Stream directly to NVDA in real-time
-                            if not self.manual_mode:
-                                new_text = self._current_text[len(self._flushed_text):]
-                                if new_text.strip():
-                                    if self.out_queue:
-                                        self._emit("TEXT:" + new_text + " ")
-                                    self._flushed_text = self._current_text
 
                     except Exception:
                         pass
