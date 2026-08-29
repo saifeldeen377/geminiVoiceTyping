@@ -302,16 +302,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     script_toggleManualCommitMode.__doc__ = "Toggle Manual Commit Mode"
 
     def script_manualCommit(self, gesture):
-        """Commit accumulated speech only while Manual Commit Mode is active."""
         if self._is_active and self._mode == "manual":
-            if not self._is_focus_editable():
-                gesture.send()
-                return
             self._send_command("COMMIT")
             return
         gesture.send()
 
-    # NVDA requires a docstring to recognize it as a script, but we can try to hide it
     script_manualCommit.__doc__ = "Commit manual voice typing text"
     script_manualCommit.hidden = True
 
