@@ -131,8 +131,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         engine = config.get("engine", "system_python")
 
         if engine == "built_in":
-            if _in_nvda:
-                ui.message("Built-in mode is under development. Please use System Python mode for now.")
+            from .built_in_transcriber import built_in_transcriber_instance
+            self._is_active = True
+            self._mode = mode
+            if mode == "manual":
+                self._bind_manual_gestures()
+            built_in_transcriber_instance.start(mode)
             return
 
         try:
@@ -192,6 +196,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         # Unbind Enter/Space/Escape when leaving manual mode
         if was_manual:
             self._unbind_manual_gestures()
+
+        engine = config.get("engine", "system_python")
+        if engine == "built_in":
+            from .built_in_transcriber import built_in_transcriber_instance
+            built_in_transcriber_instance.stop()
+            return
 
         if proc:
             try:
@@ -309,6 +319,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def script_manualCommit(self, gesture):
         if self._is_active and self._mode == "manual":
+            engine = config.get("engine", "system_python")
+            if engine == "built_in":
+                from .built_in_transcriber import built_in_transcriber_instance
+                built_in_transcriber_instance.commit()
+                # Auto-restart recording for next manual batch
+                built_in_transcriber_instance.start("manual")
+                return
+
             if self._proc and self._proc.stdin:
                 try:
                     self._proc.stdin.write(b"COMMIT\n")
@@ -334,6 +352,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     # ── NVDA Script ──────────────────────────────────────
     def script_toggleVoiceTyping(self, gesture):
         """Toggle Gemini Voice Typing on or off."""
+        engine = config.get("engine", "system_python")
+        if engine == "built_in":
+            if _in_nvda:
+                ui.message("This feature is not available in Built-in mode. Please use System Python mode from settings.")
+            return
+
         if self._is_active:
             threading.Thread(target=self._do_stop, daemon=True).start()
         else:
