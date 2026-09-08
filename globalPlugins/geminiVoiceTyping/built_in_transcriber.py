@@ -108,6 +108,8 @@ class BuiltInTranscriber:
             audio_data = f.read()
 
         if len(audio_data) < 1000: # Too short
+            if _in_nvda:
+                core.callLater(0, ui.message, "Audio too short or failed to record.")
             return
 
         b64_audio = base64.b64encode(audio_data).decode("utf-8")
@@ -157,6 +159,9 @@ class BuiltInTranscriber:
                 if text and _in_nvda:
                     is_stealth = not config.get("copy_to_clipboard", False)
                     core.callLater(0, paste_text, text, stealth=is_stealth)
+                else:
+                    if _in_nvda:
+                        core.callLater(0, ui.message, "No text returned from Gemini.")
                 break # Success
                 
             except urllib.error.HTTPError as e:
@@ -169,12 +174,12 @@ class BuiltInTranscriber:
                 else:
                     if _in_nvda:
                         core.callLater(0, tones.beep, 200, 150)
-                        core.callLater(50, ui.message, f"API Error: {e.code}")
+                        core.callLater(50, ui.message, f"API Error: {e.code} - {err_text[:50]}")
                     break
             except Exception as e:
                 if _in_nvda:
                     core.callLater(0, tones.beep, 200, 150)
-                    core.callLater(50, ui.message, "Connection Error.")
+                    core.callLater(50, ui.message, f"Connection Error: {str(e)}")
                 break
 
 built_in_transcriber_instance = BuiltInTranscriber()
