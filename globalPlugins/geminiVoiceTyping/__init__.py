@@ -128,6 +128,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
         python_path = config.get("python_path", "python")
         keys_csv = config.get_api_keys_csv()
+        engine = config.get("engine", "system_python")
+
+        if engine == "built_in":
+            if _in_nvda:
+                ui.message("Built-in mode is under development. Please use System Python mode for now.")
+            return
 
         try:
             si = subprocess.STARTUPINFO()

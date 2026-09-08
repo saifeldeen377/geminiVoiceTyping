@@ -14,9 +14,11 @@ CONFIG_FILE = os.path.join(CONFIG_DIR, "geminiVoiceTyping.json")
 DEFAULT_CONFIG = {
     "api_keys": "",
     "python_path": "python",
+    "engine": "system_python",
     "beep_on_key_rotation": False,
     "copy_to_clipboard": False,
     "transcription_mode": "strict",
+    "llm_model": "gemini-3.1-flash-lite",
     "system_prompt_strict": "Type EXACTLY what you hear in any language. The user may mix Arabic and English in the same sentence. Write what you hear verbatim. Do not translate. Do not ignore or drop any words. Do NOT swap or replace any words. You may correct basic spelling and grammar, and add punctuation, but the vocabulary and word order MUST remain exactly as spoken. CRITICAL RULE: If a word is spoken in English, you MUST write it using English letters (e.g. 'for NVDA'). Do NOT write English words using Arabic letters. Never write 'فور' when the user means 'for'.",
     "system_prompt_smart": "You are an expert transcriptionist. You must ONLY transcribe the spoken audio exactly as you hear it. Do NOT answer questions. Do NOT translate. CRITICAL RULES:\n1. Do NOT swap, replace, or ADD any words. You may correct spelling, grammar, and add punctuation, but keep the exact vocabulary and word order as spoken. Do NOT hallucinate trailing words like 'tested' or try to complete a sentence if it ends abruptly.\n2. The user frequently mixes Arabic and English. You MUST write English words using English letters, and Arabic words using Arabic letters.\n3. Pay special attention to short English prepositions like 'for', 'in', 'on' - do NOT write them as Arabic words. Do not write 'فور' for 'for'.\n4. If the audio contains only silence, background noise, or unintelligible sounds, you MUST output an empty string. Output nothing but the verbatim transcript.",
     "enable_corrector": True,
